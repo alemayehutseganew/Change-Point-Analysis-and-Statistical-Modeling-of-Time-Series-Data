@@ -1,0 +1,16 @@
+Version,Date,Event_Name,Category,Description,Hypothesized_Impact
+v1.0,1990-08-02,Iraq invades Kuwait,Conflict,Annexation removes ~4 mb/d from global supply triggering Gulf War,Immediate supply shock drives prices sharply higher
+v1.0,2003-03-19,US-led invasion of Iraq,Conflict,War risks Iraqi exports and heightens Middle East instability,Risk premium rises with elevated volatility
+v1.0,2008-09-15,Lehman Brothers collapses,Economic,Global credit crunch slashes economic activity and oil demand,Sharp demand shock drags Brent lower
+v1.0,2011-02-15,Libyan Civil War escalates,Conflict,Armed conflict cuts ~1.5 mb/d of light sweet crude exports,Supply shock drives prices higher
+v1.0,2012-07-01,EU embargo on Iranian oil begins,Policy,EU bans Iranian crude imports tightening supply,Upward pressure on Brent spread
+v1.0,2014-06-05,ISIS offensive in Northern Iraq,Conflict,Threatens key pipelines and fields,Spike in risk premium and volatility
+v1.0,2014-11-27,OPEC maintains production targets,Policy,OPEC decides against output cuts despite glut,Initiates price collapse toward 2015 lows
+v1.0,2015-07-14,Iran nuclear framework (JCPOA),Policy,Deal paves way for Iranian barrels returning in 2016,Downward pressure from expected supply growth
+v1.0,2016-11-30,OPEC+ coordinated production cuts,Policy,First joint cut with Russia and allies,Rebalances market lifting prices into 2017
+v1.0,2018-05-08,US exits JCPOA and reimposes sanctions,Policy,Sanctions target Iranian exports again,Tightens medium-term supply raising prices
+v1.0,2019-09-14,Abqaiq–Khurais drone attacks,Conflict,Temporary loss of ~5.7 mb/d Saudi output,Sharp short-lived price spike
+v1.0,2020-03-06,OPEC+ talks collapse,Policy,Russia-Saudi price war begins triggering oversupply,Historic plunge in prices/volatility
+v1.0,2020-04-12,OPEC+ record 9.7 mb/d cut,Policy,Emergency cuts to stabilize market post price war,Anchors recovery reducing volatility
+v1.0,2021-11-23,US-led SPR release announcement,Economic,Coordinated release to cool high energy prices,Moderates rally and expectations
+v1.0,2022-02-24,Russia invades Ukraine,Conflict,Major geopolitical shock affecting ~10% global supply,Drives sustained risk premium and volatility

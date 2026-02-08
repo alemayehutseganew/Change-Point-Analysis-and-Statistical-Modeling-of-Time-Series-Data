@@ -10,6 +10,7 @@
 | --- | --- | --- |
 | Brent daily spot prices (FRED: `DCOILBRENTEU`) | Core target series | Download via `pandas_datareader`, coerce to datetime index, forward-fill sporadic missing days, convert to USD/barrel float |
 | Event log (custom CSV in `data/events_catalog.csv`) | Anchor change points to real-world catalysts | Curate ≥15 major political, OPEC, conflict, and financial events with onset dates, category, narrative |
+| Versioned event snapshot (`data/events_catalog_v1.csv`) | Fixed submission-ready reference (10–15 key events) | Freeze the curated list with a version tag to make review reproducible |
 | Optional macro covariates (ICE futures curves, USD index, inflation, GDP) | Stress testing advanced models | Align frequency (daily/weekly), z-score, and join on calendar date |
 
 ## 3. Analysis Workflow

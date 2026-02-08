@@ -9,6 +9,9 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [showEvents, setShowEvents] = useState(false)
   const [errors, setErrors] = useState([])
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('All')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,11 +43,41 @@ function App() {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (!prices.length) return
+    if (!startDate) setStartDate(prices[0]?.Date ?? '')
+    if (!endDate) setEndDate(prices[prices.length - 1]?.Date ?? '')
+  }, [prices, startDate, endDate])
+
+  const eventCategories = useMemo(() => {
+    const unique = new Set(events.map((evt) => evt.Category).filter(Boolean))
+    return ['All', ...Array.from(unique).sort()]
+  }, [events])
+
+  const filteredPrices = useMemo(() => {
+    if (!prices.length) return []
+    return prices.filter((row) => {
+      if (startDate && row.Date < startDate) return false
+      if (endDate && row.Date > endDate) return false
+      return true
+    })
+  }, [prices, startDate, endDate])
+
+  const filteredEvents = useMemo(() => {
+    if (!events.length) return []
+    return events.filter((evt) => {
+      if (selectedCategory !== 'All' && evt.Category !== selectedCategory) return false
+      if (startDate && evt.Date < startDate) return false
+      if (endDate && evt.Date > endDate) return false
+      return true
+    })
+  }, [events, selectedCategory, startDate, endDate])
+
   const priceSummary = useMemo(() => {
-    if (!prices.length) return null
-    const first = prices[0]
-    const last = prices[prices.length - 1]
-    const values = prices.map((row) => row.Price).filter((v) => Number.isFinite(v))
+    if (!filteredPrices.length) return null
+    const first = filteredPrices[0]
+    const last = filteredPrices[filteredPrices.length - 1]
+    const values = filteredPrices.map((row) => row.Price).filter((v) => Number.isFinite(v))
     const min = Math.min(...values)
     const max = Math.max(...values)
     return {
@@ -52,9 +85,9 @@ function App() {
       end: last?.Date,
       min,
       max,
-      count: prices.length
+      count: filteredPrices.length
     }
-  }, [prices])
+  }, [filteredPrices])
 
   const closestEvent = useMemo(() => {
     if (!analysis?.tau_date || !events.length) return null
@@ -92,6 +125,60 @@ function App() {
       </header>
       
       <div className="dashboard-grid">
+
+        {/* Filters */}
+        <div className="card span-2">
+          <h2>Filters</h2>
+          <div className="filter-bar">
+            <div className="filter-group">
+              <label htmlFor="start-date">Start date</label>
+              <input
+                id="start-date"
+                type="date"
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+              />
+            </div>
+            <div className="filter-group">
+              <label htmlFor="end-date">End date</label>
+              <input
+                id="end-date"
+                type="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+              />
+            </div>
+            <div className="filter-group">
+              <label htmlFor="category-filter">Event category</label>
+              <select
+                id="category-filter"
+                value={selectedCategory}
+                onChange={(event) => setSelectedCategory(event.target.value)}
+              >
+                {eventCategories.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-group">
+              <label className="sr-only" htmlFor="reset-filters">Reset</label>
+              <button
+                id="reset-filters"
+                type="button"
+                onClick={() => {
+                  setStartDate(prices[0]?.Date ?? '')
+                  setEndDate(prices[prices.length - 1]?.Date ?? '')
+                  setSelectedCategory('All')
+                }}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+          <div className="filter-meta">
+            Showing {filteredPrices.length.toLocaleString()} price points and {filteredEvents.length.toLocaleString()} events
+          </div>
+        </div>
         
         {/* Model Results Card */}
         <div className="card">
@@ -136,7 +223,7 @@ function App() {
         </div>
 
         {/* Chart Card */}
-        <div className="card" style={{height: '500px'}}>
+        <div className="card span-2" style={{height: '500px'}}>
           <h2>Price History & Events</h2>
           <div className="toolbar">
             <label>
@@ -154,7 +241,7 @@ function App() {
             )}
           </div>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={prices}>
+            <LineChart data={filteredPrices}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
               <XAxis 
                 dataKey="Date" 
@@ -186,7 +273,7 @@ function App() {
                 />
               )}
 
-              {showEvents && events.map((evt, idx) => (
+              {showEvents && filteredEvents.map((evt, idx) => (
                 <ReferenceLine key={idx} x={evt.Date} stroke="#4caf50" opacity={0.2} />
               ))}
             </LineChart>
@@ -271,7 +358,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {events.slice(0, 12).map((evt, idx) => (
+                {filteredEvents.slice(0, 12).map((evt, idx) => (
                   <tr key={idx}>
                     <td>{evt.Date}</td>
                     <td>{evt.Event_Name}</td>

@@ -45,8 +45,11 @@ To regenerate the model results (Task 2):
 - **Inference**: NUTS sampler via PyMC.
 - **Diagnostics**: Stationarity checks (ADF/KPSS), summary stats, and posterior diagnostics (R-hat/ESS).
 
+See the short model write-up in [docs/change_point_model.md](docs/change_point_model.md).
+
 ## Curated Event Catalog
 The project includes a curated event table (15+ major events) in [data/events_catalog.csv](data/events_catalog.csv).
+For a fixed, versioned snapshot used in review, see [data/events_catalog_v1.csv](data/events_catalog_v1.csv).
 
 | Date | Event | Category | Hypothesized Impact |
 | --- | --- | --- | --- |
@@ -58,6 +61,15 @@ The project includes a curated event table (15+ major events) in [data/events_ca
 (See dashboard for latest model run)
 - The model detects structural breaks correlating with major supply shocks.
 - Volatility clustering is observed during conflict periods (1990, 2011, 2022).
+
+## Dashboard Filters
+The UI includes explicit date-range and event-category filters:
+- Start and end date inputs to focus the price timeline and event overlay.
+- Event category dropdown (All, Conflict, Policy, Economic).
+- Event markers toggle in the chart card.
+
+## Screenshots
+![Dashboard overview](docs/screenshots/dashboard.svg)
 
 ## API Endpoints
 
@@ -80,6 +92,7 @@ The project includes a curated event table (15+ major events) in [data/events_ca
 - Data quality + stationarity diagnostics: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
 - Assumptions and limitations: [docs/assumptions_limitations.md](docs/assumptions_limitations.md)
 - Analysis plan & event research: [docs/task1_analysis_plan.md](docs/task1_analysis_plan.md)
+- Change-point model summary: [docs/change_point_model.md](docs/change_point_model.md)
 
 ### Task 2: Bayesian Change Point Modeling (/8)
 - PyMC model definition and sampling: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)

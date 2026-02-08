@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <rect width="1200" height="675" fill="#111827" />
+  <rect x="60" y="60" width="1080" height="555" rx="20" fill="#1f2937" stroke="#374151" stroke-width="2" />
+  <text x="600" y="220" fill="#f9fafb" font-size="42" font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    Brent Dashboard Screenshot
+  </text>
+  <text x="600" y="290" fill="#9ca3af" font-size="22" font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    Placeholder image (replace with real UI capture)
+  </text>
+  <rect x="140" y="360" width="920" height="180" rx="14" fill="#111827" stroke="#4b5563" stroke-width="2" />
+  <text x="600" y="455" fill="#9ca3af" font-size="18" font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    charts • filters • event overlays
+  </text>
+</svg>
