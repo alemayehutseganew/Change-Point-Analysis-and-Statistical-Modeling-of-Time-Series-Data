@@ -52,7 +52,9 @@
 | Audience | Medium | Cadence |
 | --- | --- | --- |
 | Internal mentors (Kerod, Filimon, Mahbubah) | Slack `#all-week11`, shared Google Doc for interim notes | Daily async updates, office hours Q&A |
-| Stakeholders (investors/policymakers) | Executive summary PDF + dashboard walkthrough (Zoom) | Interim (Feb 8) and final (Feb 10) |
+| Investors | Executive summary PDF, change-point snapshot slides, dashboard walkthrough (Zoom) | Interim (Feb 8) and final (Feb 10) |
+| Policymakers | Policy memo (2–4 pages) with key dates and confidence notes, dashboard export | Interim and final |
+| Energy companies (traders/ops) | Ops brief with timeline of supply shocks, interactive dashboard with event overlays | Weekly while active, final handoff |
 | Engineering peers | GitHub Issues/Projects, README updates | Continuous |
 
 ## 8. Tooling & References

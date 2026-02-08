@@ -43,8 +43,61 @@ To regenerate the model results (Task 2):
 - **Data Source**: FRED (DCOILBRENTEU), daily spot prices.
 - **Model**: Bayesian Change Point model with a single switch point (Discrete Uniform prior for $\tau$).
 - **Inference**: NUTS sampler via PyMC.
+- **Diagnostics**: Stationarity checks (ADF/KPSS), summary stats, and posterior diagnostics (R-hat/ESS).
+
+## Curated Event Catalog
+The project includes a curated event table (15+ major events) in [data/events_catalog.csv](data/events_catalog.csv).
+
+| Date | Event | Category | Hypothesized Impact |
+| --- | --- | --- | --- |
+| 1990-08-02 | Iraq invades Kuwait | Conflict | Immediate supply shock drives prices higher |
+| 2014-11-27 | OPEC maintains production targets | Policy | Initiates price collapse into 2015 |
+| 2022-02-24 | Russia invades Ukraine | Conflict | Sustained risk premium and volatility |
 
 ## Key Findings
 (See dashboard for latest model run)
 - The model detects structural breaks correlating with major supply shocks.
 - Volatility clustering is observed during conflict periods (1990, 2011, 2022).
+
+## API Endpoints
+
+| Endpoint | Description | Notes |
+| --- | --- | --- |
+| `/api/health` | Health check | Returns backend status + data directory + results availability |
+| `/api/analysis` | Latest analysis artifacts | Requires `data/analysis_results.json` |
+| `/api/prices` | Price series (JSON) | Supports `limit`, `start`, `end` query params |
+| `/api/events` | Event catalog | Reads `data/events_catalog.csv` |
+
+### Example Queries
+- `/api/prices?limit=1500`
+- `/api/prices?start=2010-01-01&end=2012-12-31`
+
+## Rubric Coverage Map
+
+### Task 1: Foundation and Data Analysis Workflow (/5)
+- Data acquisition, cleaning, and persistence: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- EDA (trend, returns, volatility): [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- Data quality + stationarity diagnostics: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- Assumptions and limitations: [docs/assumptions_limitations.md](docs/assumptions_limitations.md)
+- Analysis plan & event research: [docs/task1_analysis_plan.md](docs/task1_analysis_plan.md)
+
+### Task 2: Bayesian Change Point Modeling (/8)
+- PyMC model definition and sampling: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- Posterior diagnostics and summaries: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- Change point interpretation + event alignment: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+- Persisted artifacts for API use: [notebooks/brent_changepoint.ipynb](notebooks/brent_changepoint.ipynb)
+
+### Task 3: Dashboard Development (/7)
+- Flask API serving analysis + data: [backend/app.py](backend/app.py)
+- React dashboard visualization: [frontend/src/App.jsx](frontend/src/App.jsx)
+- UI styling: [frontend/src/index.css](frontend/src/index.css)
+- Diagnostics & event-match panels: [frontend/src/App.jsx](frontend/src/App.jsx)
+
+### Git & GitHub Best Practices (/4)
+- Clear structure and documentation: [README.md](README.md)
+- Ignored artifacts: [.gitignore](.gitignore)
+- Consistent commit history and remote tracking (see Git log)
+
+### Code Best Practices (/3)
+- Modular functions and defensive checks: [backend/app.py](backend/app.py)
+- UI state handling and error messaging: [frontend/src/App.jsx](frontend/src/App.jsx)

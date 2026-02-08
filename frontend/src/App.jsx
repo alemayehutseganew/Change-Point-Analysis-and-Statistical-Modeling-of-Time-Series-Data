@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 
@@ -7,27 +7,80 @@ function App() {
   const [prices, setPrices] = useState([])
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showEvents, setShowEvents] = useState(false)
+  const [errors, setErrors] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [analysisRes, pricesRes, eventsRes] = await Promise.allSettled([
           axios.get('/api/analysis'),
-          axios.get('/api/prices'),
+          axios.get('/api/prices?limit=2500'),
           axios.get('/api/events')
         ])
 
+        const nextErrors = []
         if (analysisRes.status === 'fulfilled') setAnalysis(analysisRes.value.data)
+        else nextErrors.push('Analysis results unavailable (run the notebook).')
+
         if (pricesRes.status === 'fulfilled') setPrices(pricesRes.value.data)
+        else nextErrors.push('Price data unavailable.')
+
         if (eventsRes.status === 'fulfilled') setEvents(eventsRes.value.data)
+        else nextErrors.push('Events catalog unavailable.')
+
+        setErrors(nextErrors)
       } catch (error) {
         console.error("Error fetching data:", error)
+        setErrors(['Failed to connect to the API.'])
       } finally {
         setLoading(false)
       }
     }
     fetchData()
   }, [])
+
+  const priceSummary = useMemo(() => {
+    if (!prices.length) return null
+    const first = prices[0]
+    const last = prices[prices.length - 1]
+    const values = prices.map((row) => row.Price).filter((v) => Number.isFinite(v))
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    return {
+      start: first?.Date,
+      end: last?.Date,
+      min,
+      max,
+      count: prices.length
+    }
+  }, [prices])
+
+  const closestEvent = useMemo(() => {
+    if (!analysis?.tau_date || !events.length) return null
+    const tau = new Date(analysis.tau_date)
+    const ranked = events
+      .map((evt) => ({
+        ...evt,
+        diff: Math.abs(new Date(evt.Date) - tau)
+      }))
+      .filter((evt) => Number.isFinite(evt.diff))
+      .sort((a, b) => a.diff - b.diff)
+    return ranked[0] || null
+  }, [analysis, events])
+
+  const eventMatches = useMemo(() => {
+    if (!analysis?.event_matches) return []
+    return analysis.event_matches
+  }, [analysis])
+
+  const stationaritySummary = useMemo(() => {
+    if (!analysis?.stationarity) return null
+    if (analysis.stationarity.error) return analysis.stationarity.error
+    const adfP = analysis.stationarity.adf_pvalue
+    const kpssP = analysis.stationarity.kpss_pvalue
+    return `ADF p=${adfP?.toFixed?.(4) ?? adfP}, KPSS p=${kpssP?.toFixed?.(4) ?? kpssP}`
+  }, [analysis])
 
   if (loading) return <div className="container">Loading Dashboard...</div>
 
@@ -43,6 +96,13 @@ function App() {
         {/* Model Results Card */}
         <div className="card">
           <h2>Change Point Detection</h2>
+          {errors.length > 0 && (
+            <div className="alert">
+              {errors.map((msg, idx) => (
+                <div key={idx}>{msg}</div>
+              ))}
+            </div>
+          )}
           {analysis ? (
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px'}}>
               <div className="stat-box">
@@ -61,6 +121,14 @@ function App() {
                 <div className="stat-label">Shift Magnitude</div>
                 <div className="stat-value">{analysis.mean_shift_pct?.toFixed(2)}%</div>
               </div>
+              {closestEvent && (
+                <div className="stat-box">
+                  <div className="stat-label">Closest Catalog Event</div>
+                  <div className="stat-value" style={{fontSize: '1em'}}>
+                    {closestEvent.Event_Name} ({closestEvent.Date})
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <p>Model analysis not yet available. Please run the notebook.</p>
@@ -70,6 +138,21 @@ function App() {
         {/* Chart Card */}
         <div className="card" style={{height: '500px'}}>
           <h2>Price History & Events</h2>
+          <div className="toolbar">
+            <label>
+              <input
+                type="checkbox"
+                checked={showEvents}
+                onChange={(event) => setShowEvents(event.target.checked)}
+              />
+              Show event markers
+            </label>
+            {priceSummary && (
+              <div className="meta">
+                {priceSummary.start} → {priceSummary.end} · {priceSummary.count.toLocaleString()} points
+              </div>
+            )}
+          </div>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={prices}>
               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -103,14 +186,75 @@ function App() {
                 />
               )}
 
-              {/* Event Lines (Optional - could be cluttered) */}
-              {/* 
-              {events.map((evt, idx) => (
-                <ReferenceLine key={idx} x={evt.Date} stroke="green" opacity={0.3} />
-              ))} 
-              */}
+              {showEvents && events.map((evt, idx) => (
+                <ReferenceLine key={idx} x={evt.Date} stroke="#4caf50" opacity={0.2} />
+              ))}
             </LineChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* Data Quality & Diagnostics */}
+        <div className="card">
+          <h2>Data Quality & Diagnostics</h2>
+          {analysis ? (
+            <div className="metrics-grid">
+              <div className="metric">
+                <div className="metric-label">Coverage</div>
+                <div className="metric-value">
+                  {analysis.data_quality?.coverage_start} → {analysis.data_quality?.coverage_end}
+                </div>
+              </div>
+              <div className="metric">
+                <div className="metric-label">Missing Prices</div>
+                <div className="metric-value">{analysis.data_quality?.missing_price ?? '—'}</div>
+              </div>
+              <div className="metric">
+                <div className="metric-label">Missing Log Returns</div>
+                <div className="metric-value">{analysis.data_quality?.missing_log_return ?? '—'}</div>
+              </div>
+              <div className="metric">
+                <div className="metric-label">Duplicate Dates</div>
+                <div className="metric-value">{analysis.data_quality?.duplicate_dates ?? '—'}</div>
+              </div>
+              <div className="metric span-2">
+                <div className="metric-label">Stationarity Tests</div>
+                <div className="metric-value">{stationaritySummary ?? 'Not available'}</div>
+              </div>
+            </div>
+          ) : (
+            <p>Run the notebook to populate diagnostics.</p>
+          )}
+        </div>
+
+        {/* Top Event Matches */}
+        <div className="card">
+          <h2>Closest Events to Detected Shift</h2>
+          {eventMatches.length ? (
+            <div style={{overflowX: 'auto'}}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Category</th>
+                    <th>Days From Shift</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {eventMatches.map((evt, idx) => (
+                    <tr key={idx}>
+                      <td>{evt.Date}</td>
+                      <td>{evt.Event_Name}</td>
+                      <td>{evt.Category}</td>
+                      <td>{evt.Days_From_Tau}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>Event match table will appear after running the notebook.</p>
+          )}
         </div>
 
         {/* Events Table Card */}
@@ -127,7 +271,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {events.slice(0, 10).map((evt, idx) => (
+                {events.slice(0, 12).map((evt, idx) => (
                   <tr key={idx}>
                     <td>{evt.Date}</td>
                     <td>{evt.Event_Name}</td>

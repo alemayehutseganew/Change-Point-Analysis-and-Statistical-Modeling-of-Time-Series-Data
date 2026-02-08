@@ -33,6 +33,32 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+.alert {
+  background: rgba(255, 82, 82, 0.12);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  color: #ffb3b3;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  color: #c7c7c7;
+}
+
+.toolbar input {
+  margin-right: 8px;
+}
+
+.meta {
+  opacity: 0.8;
+}
+
 h1 { font-size: 2.5em; line-height: 1.1; }
 h2 { margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 
@@ -45,6 +71,33 @@ h2 { margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 
 .stat-label { font-size: 0.9em; color: #888; }
 .stat-value { font-size: 1.4em; font-weight: bold; }
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  background: #2a2a2a;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.metric-label {
+  font-size: 0.85em;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.metric.span-2 {
+  grid-column: span 2;
+}
 
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 12px; border-bottom: 1px solid #444; }
