@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Data (keep catalog, ignore large downloads if preferred, but for this exercise we keep them)
+# data/*.csv
+# !data/events_catalog.csv
+
+# Jupyter
+.ipynb_checkpoints/
